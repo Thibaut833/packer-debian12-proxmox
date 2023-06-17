@@ -26,3 +26,9 @@ Personal deployment of Debian 12 on Proxmox with a little job ansible to create 
     - tpl_gtw: gateway's ip address
     - tpl_dns: dns server's ip address
     - tpl_domain: local domain name
+
+## Start the deployment (with theses files)
+
+```
+packer build .
+```
