@@ -27,7 +27,7 @@ Personal deployment of Debian 12 on Proxmox with a little job ansible to create 
     - tpl_dns: dns server's ip address
     - tpl_domain: local domain name
 
-## Start the deployment (with theses files)
+## Start the deployment (with these files)
 
 ```
 packer build .
