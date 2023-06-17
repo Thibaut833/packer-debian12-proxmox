@@ -1,0 +1,6 @@
+ansible
+ansible.pub
+id_rsa.pub
+passvault.txt
+vault.yml
+variables.pkr.hcl

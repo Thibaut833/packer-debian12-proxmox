@@ -1,0 +1,65 @@
+---
+- name: Installation template packer
+  hosts: default
+  become: true
+  vars_files: ../vault.yml
+  remote_user: packer
+  tasks:
+    - name: J'installe les dépendances
+      ansible.builtin.package:
+        name: python3-passlib
+        state: present
+      delegate_to: localhost
+
+    - name: Je crée le dossier .ssh pour root
+      ansible.builtin.file:
+        path: /root/.ssh
+        state: directory
+        owner: root
+        group: root
+        mode: "700"
+
+    - name: Je déploie ma clé ssh sur root
+      ansible.builtin.copy:
+        src: ../id_rsa.pub
+        dest: /root/.ssh/authorized_keys
+        mode: "644"
+
+    - name: Je change le mot de passe root
+      ansible.builtin.user:
+        name: root
+        password: "{{ root_password | password_hash('sha512') }}"
+        update_password: always
+
+    - name: Je crée l'utilisateur ansible
+      ansible.builtin.user:
+        name: ansible
+        password: "{{ ansible_password | password_hash('sha512') }}"
+        shell: /bin/bash
+        groups: sudo
+        update_password: always
+
+    - name: Je crée le dossier .ssh pour ansible
+      ansible.builtin.file:
+        path: /home/ansible/.ssh
+        state: directory
+        owner: ansible
+        group: ansible
+        mode: "700"
+
+    - name: Je déploie la clé de l'utilisateur ansible
+      ansible.builtin.copy:
+        src: ../ansible.pub
+        dest: /home/ansible/.ssh/authorized_keys
+        mode: "644"
+
+    - name: Je supprime l'utilisateur packer
+      ansible.builtin.user:
+        name: packer
+        remove: true
+
+    - name: Je désactive le swap pour kub
+      ansible.builtin.lineinfile:
+        path: /etc/fstab
+        line: "/dev/mapper/template--vg-swap_1 none            swap    sw              0       0"
+        state: absent
